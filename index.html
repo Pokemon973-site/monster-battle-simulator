@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Batalhas Pokémon</title>
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #f0f0f0;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .pixel {
+            font-family: 'Press Start 2P', cursive;
+        }
+        .pokemon-select, .battle-log {
+            margin-top: 20px;
+        }
+        .battle-log {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            height: 150px;
+            overflow-y: auto;
+        }
+        .pokemon {
+            display: inline-block;
+            width: 45%;
+            vertical-align: top;
+        }
+        .pokemon img {
+            width: 100px;
+            height: 100px;
+        }
+        .pokemon-details {
+            text-align: left;
+            margin-top: 10px;
+        }
+        .battle-info {
+            margin-top: 20px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="pixel">Simulador de Batalhas Pokémon</h1>
+        <div class="pokemon-select">
+            <div class="pokemon">
+                <h2>Pokémon 1</h2>
+                <select id="pokemon1-select" onchange="loadPokemonData(1)">
+                    <option value="0">Bulbasaur</option>
+                    <option value="1">Charmander</option>
+                    <option value="2">Squirtle</option>
+                </select>
+                <div class="pokemon-details" id="pokemon1-details"></div>
+            </div>
+            <div class="pokemon">
+                <h2>Pokémon 2</h2>
+                <select id="pokemon2-select" onchange="loadPokemonData(2)">
+                    <option value="0">Bulbasaur</option>
+                    <option value="1">Charmander</option>
+                    <option value="2">Squirtle</option>
+                </select>
+                <div class="pokemon-details" id="pokemon2-details"></div>
+            </div>
+        </div>
+        <div class="battle-info">
+            <button onclick="startBattle()">Iniciar Batalha</button>
+            <div class="battle-log" id="battle-log"></div>
+        </div>
+    </div>
+
+    <script>
+        const pokemons = [
+            {
+                name: "Bulbasaur",
+                type: ["Grass", "Poison"],
+                hp: 45,
+                attack: 49,
+                defense: 49,
+                abilities: ["Overgrow"],
+                moves: ["Tackle", "Growl", "Leech Seed", "Vine Whip"]
+            },
+            {
+                name: "Charmander",
+                type: ["Fire"],
+                hp: 39,
+                attack: 52,
+                defense: 43,
+                abilities: ["Blaze"],
+                moves: ["Scratch", "Growl", "Ember", "Smokescreen"]
+            },
+            {
+                name: "Squirtle",
+                type: ["Water"],
+                hp: 44,
+                attack: 48,
+                defense: 65,
+                abilities: ["Torrent"],
+                moves: ["Tackle", "Tail Whip", "Water Gun", "Withdraw"]
+            }
+        ];
+
+        const loadPokemonData = (pokemonNumber) => {
+            const select = document.getElementById(`pokemon${pokemonNumber}-select`);
+            const details = document.getElementById(`pokemon${pokemonNumber}-details`);
+            const selectedPokemon = pokemons[select.value];
+            details.innerHTML = `
+                <img src="images/${selectedPokemon.name.toLowerCase()}.png" alt="${selectedPokemon.name}">
+                <p><strong>Tipo:</strong> ${selectedPokemon.type.join(', ')}</p>
+                <p><strong>HP:</strong> ${selectedPokemon.hp}</p>
+                <p><strong>Ataque:</strong> ${selectedPokemon.attack}</p>
+                <p><strong>Defesa:</strong> ${selectedPokemon.defense}</p>
+                <p><strong>Habilidades:</strong> ${selectedPokemon.abilities.join(', ')}</p>
+                <p><strong>Movimentos:</strong> ${selectedPokemon.moves.join(', ')}</p>
+            `;
+        };
+
+        const startBattle = () => {
+            const log = document.getElementById('battle-log');
+            log.innerHTML = 'A batalha começou!<br>';
+            const pokemon1 = pokemons[document.getElementById('pokemon1-select').value];
+            const pokemon2 = pokemons[document.getElementById('pokemon2-select').value];
+            
+            log.innerHTML += `${pokemon1.name} vs ${pokemon2.name}<br>`;
+            
+            let hp1 = pokemon1.hp;
+            let hp2 = pokemon2.hp;
+
+            while (hp1 > 0 && hp2 > 0) {
+                hp2 -= Math.max(0, pokemon1.attack - pokemon2.defense);
+                log.innerHTML += `${pokemon1.name} ataca ${pokemon2.name}, HP de ${pokemon2.name}: ${hp2}<br>`;
+                if (hp2 <= 0) {
+                    log.innerHTML += `${pokemon1.name} venceu a batalha!<br>`;
+                    break;
+                }
+                hp1 -= Math.max(0, pokemon2.attack - pokemon1.defense);
+                log.innerHTML += `${pokemon2.name} ataca ${pokemon1.name}, HP de ${pokemon1.name}: ${hp1}<br>`;
+                if (hp1 <= 0) {
+                    log.innerHTML += `${pokemon2.name} venceu a batalha!<br>`;
+                    break;
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPokemonData(1);
+            loadPokemonData(2);
+        });
+    </script>
+</body>
+</html>
